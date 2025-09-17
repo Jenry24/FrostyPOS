@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Order Summary</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+   main {
+  flex: 1;
+  padding: 3vh;                      /* was 30px */
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-bottom: 2vh;                /* was 20px */
+  font-size: 2vw;                    /* scales with width */
+}
+
+table {
+  width: 80%;
+  border-collapse: collapse;
+  background: #ffffff;
+  margin-bottom: 2vh;                /* was 20px */
+}
+
+th, td {
+  border: 0.2vh solid #ccc;          /* scalable border */
+  padding: 1vh 1vw;                  /* was 10px */
+  text-align: center;
+  font-size: 1.2vw;
+}
+
+th {
+  background: #25be0d;
+}
+
+.totals {
+  margin: 2vh 0;
+  font-size: 1.5vw;                  /* was 18px */
+}
+
+.payment button {
+  padding: 1.2vh 2vw;                /* was 10px 20px */
+  margin: 0 1vw;
+  border: none;
+  border-radius: 0.8vh;              /* was 5px */
+  font-size: 1.2vw;                  /* was 16px */
+  cursor: pointer;
+  background: #ddd;
+}
+
+.payment button.active {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.actions {
+  margin-top: 3vh;                   /* was 25px */
+  display: flex;
+  gap: 2vw;                          /* was 15px */
+}
+
+.complete-btn,
+.cancel-btn {
+  padding: 1.5vh 2.5vw;              /* was 12px 20px */
+  font-size: 1.5vw;                  /* was 18px */
+  border: none;
+  border-radius: 0.8vh;              /* was 6px */
+  cursor: pointer;
+}
+
+.complete-btn {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.complete-btn:disabled {
+  background: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #e53935;
+  color: #fff;
+}
+
+/* ✅ Floating modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 3vh;                      /* was 25px */
+  border-radius: 1.2vh;              /* was 10px */
+  text-align: center;
+  width: 40vw;                       /* was 300px */
+  max-width: 90%;                    /* ensure fits small screens */
+  box-shadow: 0 0.8vh 1.5vh rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+  margin-bottom: 2vh;                /* was 20px */
+  font-size: 2vw;                    /* was 20px */
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 2vh;                   /* was 15px */
+}
+
+.modal-buttons button {
+  padding: 1.2vh 2vw;                /* was 10px 18px */
+  border: none;
+  border-radius: 0.8vh;              /* was 6px */
+  font-size: 1.2vw;                  /* was 16px */
+  cursor: pointer;
+}
+
+.yes-btn {
+  background: #e53935;
+  color: #fff;
+}
+
+.no-btn {
+  background: #ccc;
+}
+
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo"><img src="frosty.jpg" alt="Logo"></div>
+  <button class="nav-btn">Back to Menu</button>
+  <button class="nav-btn">Sales</button>
+  <button class="nav-btn logout">🚪 Logout</button>
+</aside>
+
+<main>
+  <h1>Order Summary</h1>
+  <table id="summary-table">
+    <thead>
+      <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="totals">
+    <p>Subtotal: ₱<span id="subtotal">0.00</span></p>
+    <p>Total: ₱<span id="total">0.00</span></p>
+
+    <div id="cash-input" style="display:none;">
+      <p>
+        Amount Received: ₱
+        <input type="number" id="amountReceived" min="0" step="0.01" style="width:100px; padding:5px;">
+      </p>
+      <p>Change: ₱<span id="change">0.00</span></p>
+    </div>
+  </div>
+
+  <div class="payment">
+    <button data-method="cash">💵 Cash</button>
+    <button data-method="gcash">📱 GCash</button>
+  </div>
+
+  <div class="actions">
+    <button class="complete-btn" id="completeBtn" disabled>✅ Complete Transaction</button>
+    <button class="cancel-btn" id="cancelBtn">❌ Cancel Order</button>
+  </div>
+</main>
+
+<!-- ✅ Modal -->
+<div class="modal" id="cancelModal">
+  <div class="modal-content">
+    <h2>Cancel this order?</h2>
+    <div class="modal-buttons">
+      <button class="yes-btn" id="yesCancel">Yes</button>
+      <button class="no-btn" id="noCancel">No</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedMethod = null;
+
+function loadSummary(){
+  const data = localStorage.getItem('frostyOrder');
+  if(!data) return;
+  const orders = JSON.parse(data);
+  const tbody = document.querySelector('#summary-table tbody');
+  let subtotal = 0;
+  orders.forEach(o=>{
+    const sub = o.price * o.qty;
+    subtotal += sub;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${o.name}</td>
+                    <td>${o.qty}</td>
+                    <td>₱${o.price.toFixed(2)}</td>
+                    <td>₱${sub.toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+  document.getElementById('total').textContent = subtotal.toFixed(2);
+}
+
+function calculateChange() {
+  const total = parseFloat(document.getElementById('total').textContent);
+  const received = parseFloat(document.getElementById('amountReceived').value || 0);
+  const change = received - total;
+
+  if (change < 0) {
+    document.getElementById('change').textContent = "Insufficient";
+    document.getElementById('completeBtn').disabled = true;
+  } else {
+    document.getElementById('change').textContent = change.toFixed(2);
+    if (selectedMethod) {
+      document.getElementById('completeBtn').disabled = false;
+    }
+  }
+}
+
+function completeOrder(){
+  const total = parseFloat(document.getElementById('total').textContent);
+  let received = 0;
+  let change = 0;
+
+  if (selectedMethod === "cash") {
+    received = parseFloat(document.getElementById('amountReceived').value || 0);
+    if (received < total) {
+      alert("Customer payment is insufficient!");
+      return;
+    }
+    change = (received - total).toFixed(2);
+  } else {
+    received = total;
+    change = 0;
+  }
+
+  const existing = JSON.parse(localStorage.getItem('frostySales') || '[]');
+  existing.push({
+    date: new Date().toLocaleString(),
+    payment: selectedMethod,
+    order: JSON.parse(localStorage.getItem('frostyOrder')),
+    total: total,
+    received: received,
+    change: change
+  });
+  localStorage.setItem('frostySales', JSON.stringify(existing));
+  localStorage.removeItem('frostyOrder');
+
+  alert('Transaction Saved!' + 
+        (selectedMethod === "cash" ? `\nChange: ₱${change}` : "\nPayment via GCash"));
+  window.location = 'sales.html';
+}
+
+// ✅ Cancel order with modal
+function openCancelModal(){
+  document.getElementById('cancelModal').style.display = "flex";
+}
+function closeCancelModal(){
+  document.getElementById('cancelModal').style.display = "none";
+}
+function confirmCancelOrder(){
+  localStorage.removeItem('frostyOrder');
+  window.location = 'FROSTY.html';
+}
+
+document.querySelectorAll('.payment button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.payment button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedMethod = btn.dataset.method;
+
+    if (selectedMethod === "cash") {
+      document.getElementById('cash-input').style.display = "block";
+    } else {
+      document.getElementById('cash-input').style.display = "none";
+    }
+    document.getElementById('completeBtn').disabled = false;
+  });
+});
+
+document.getElementById('amountReceived').addEventListener('input', calculateChange);
+document.getElementById('completeBtn').addEventListener('click', completeOrder);
+document.getElementById('cancelBtn').addEventListener('click', openCancelModal);
+
+// ✅ Modal buttons
+document.getElementById('yesCancel').addEventListener('click', confirmCancelOrder);
+document.getElementById('noCancel').addEventListener('click', closeCancelModal);
+
+loadSummary();
+</script>
+
+</body>
+</html>

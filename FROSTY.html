@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Frosty & Fancy Menu</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><img src="frosty.jpg" alt="Frosty Logo"></div>
+    <button class="nav-btn active">Menu</button>
+    <button class="nav-btn" onclick="location.href='sales.html'">Sales</button>
+    <button class="nav-btn logout" onclick="logout()">Logout</button>
+  </aside>
+
+  <main>
+    <!-- Kiddie Edition -->
+    <h1>Kiddie Edition</h1>
+    <div class="grid">
+      <div class="card" data-name="Sugar Cone" data-price="20" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Sugar Cone"><h3>Sugar Cone</h3><p>₱20.00</p>
+      </div>
+      <div class="card" data-name="Mini Rainbow Delight" data-price="45" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Mini Rainbow Delight"><h3>Mini Rainbow Delight</h3><p>₱45.00</p>
+      </div>
+    </div>
+
+    <!-- Sundaes -->
+    <h1>Sundaes</h1>
+    <div class="grid">
+      <div class="card" data-name="Chocolate Sundae" data-price="37" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Chocolate"><h3>Chocolate</h3><p>₱37.00</p>
+      </div>
+      <div class="card" data-name="Caramel Sundae" data-price="37" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Caramel"><h3>Caramel</h3><p>₱37.00</p>
+      </div>
+      <div class="card" data-name="Strawberry Sundae" data-price="37" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Strawberry"><h3>Strawberry</h3><p>₱37.00</p>
+      </div>
+    </div>
+
+    <!-- Floats -->
+    <h1>Floats</h1>
+    <div class="grid">
+      <div class="card" data-name="Coke Float" data-size="12:39,16:49" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Coke Float"><h3>Coke</h3><p>12 oz ₱39 / 16 oz ₱49</p>
+      </div>
+      <div class="card" data-name="Chuckie Float" data-size="12:49,16:59" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Chuckie"><h3>Chuckie</h3><p>12 oz ₱49 / 16 oz ₱59</p>
+      </div>
+      <div class="card" data-name="Dutch Mill Float" data-size="12:49,16:59" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Dutch Mill"><h3>Dutch Mill</h3><p>12 oz ₱49 / 16 oz ₱59</p>
+      </div>
+    </div>
+
+    <!-- Premium -->
+    <h1>Premium</h1>
+    <div class="grid">
+      <!-- Same price for all premium items -->
+      <div class="card" data-name="Supreme Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Supreme Oreo"><h3>Supreme Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Kitkat Pro" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Kitkat Pro"><h3>Kitkat Pro</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Pepero Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Pepero Oreo"><h3>Pepero Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Choco Almond" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Choco Almond"><h3>Choco Almond</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Choco Stick" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Choco Stick"><h3>Choco Stick</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Rainbow Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Rainbow Oreo"><h3>Rainbow Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="White Choco Chips" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="White Choco Chips"><h3>White Choco Chips</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+      <div class="card" data-name="Cashew Caramel" data-size="12:68,16:78" data-img="frosty.jpg">
+        <img src="frosty.jpg" alt="Cashew Caramel"><h3>Cashew Caramel</h3><p>12 oz ₱68 / 16 oz ₱78</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating Modal -->
+  <div class="modal" id="productModal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <img id="modalImg" src="" alt="">
+      <h2 id="modalName"></h2>
+      <p id="modalPrice"></p>
+
+      <!-- Size options appear only if needed -->
+      <div class="size-options" id="sizeOptions">
+  
+  <div class="size-btn active" data-size="12oz">12oz ₱39</div> 
+</div>
+
+<div class="qty-controls">
+  <button id="minusQty">–</button>
+  <span id="modalQty">1</span>
+  <button id="plusQty">+</button>
+</div>
+      </label>
+      <div class="modal-actions">
+        <button id="addOrder">Add to Order</button>
+        <button id="goCheckout">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="menu.js">
+   function logout() {
+  // Only clear login info
+  localStorage.removeItem("loggedInUser");
+  sessionStorage.clear();
+
+  // Redirect to login page
+  window.location.href = "login.html";
+}
+
+  </script>
+</body>
+</html>

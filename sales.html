@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sales Records</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-top: 2vh;   /* was 20px */
+}
+
+thead {
+  background: #4caf50;
+  color: #fff;
+}
+
+th, td {
+  border: 0.2vh solid #ddd;   /* scales with height */
+  padding: 1.2vh 1vw;         /* scales with screen */
+  text-align: left;
+  font-size: 1.2vw;           /* resizes with width */
+}
+
+tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* --- Export Buttons --- */
+.export-buttons {
+  margin-top: 2vh;            /* was 20px */
+  display: flex;
+  gap: 1vw;
+  justify-content: center;
+}
+
+.export-buttons button {
+  padding: 1.2vh 2vw;         /* resizes button nicely */
+  background: #2196f3;
+  border: none;
+  border-radius: 1vh;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.2vw;           /* scalable text */
+  transition: background 0.2s;
+}
+
+.export-buttons button:hover {
+  background: #1976d2;
+}
+
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo"><img src="frosty.jpg" alt="Logo"></div>
+  <button class="nav-btn" onclick="location.href='FROSTY.html'">Menu</button>
+  <button class="nav-btn active">Sales</button>
+<button class="nav-btn logout" onclick="logout()">Logout</button>
+</aside>
+
+<main>
+  <h1>Sales Records</h1>
+  <table id="sales-table">
+    <thead>
+      <tr>
+        <th>Date/Time</th>
+        <th>Items</th>
+        <th>Payment Method</th>
+        <th>Received (₱)</th>
+        <th>Change (₱)</th>
+        <th>Total (₱)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="export-buttons">
+    <button id="dailyBtn">Save Daily Sales</button>
+    <button id="weeklyBtn">Save Weekly Sales</button>
+    <button id="monthlyBtn">Save Monthly Sales</button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+function loadSales(){
+  const sales = JSON.parse(localStorage.getItem('frostySales') || '[]');
+  const tbody = document.querySelector('#sales-table tbody');
+  tbody.innerHTML = '';
+
+  sales.forEach(sale=>{
+    const total = sale.total || (sale.order ? sale.order.reduce((sum,o)=> sum + o.price * o.qty, 0) : 0);
+    const items = sale.order ? sale.order.map(o=>`${o.name} x${o.qty}`).join(', ') : "—";
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${sale.date}</td>
+      <td>${items}</td>
+      <td>${sale.payment || "—"}</td>
+      <td>${sale.received !== undefined ? sale.received : "—"}</td>
+      <td>${sale.change !== undefined ? sale.change : "—"}</td>
+      <td>${total.toFixed(2)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== Filter Sales =====
+function filterSales(period){
+  const all = JSON.parse(localStorage.getItem('frostySales') || '[]');
+  const now = new Date();
+  return all.filter(s => {
+    const d = new Date(s.date);
+    if(period==='daily'){
+      return d.toDateString() === now.toDateString();
+    } else if(period==='weekly'){
+      const weekAgo = new Date(); weekAgo.setDate(now.getDate()-7);
+      return d >= weekAgo;
+    } else if(period==='monthly'){
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+  });
+}
+
+// ===== Export Excel =====
+function exportExcel(period){
+  const data = filterSales(period);
+  if(!data.length){ alert('No sales found for this period.'); return; }
+
+  let rows = [["Date/Time","Items","Payment","Received","Change","Total (₱)"]];
+  let grandTotal = 0;
+  data.forEach(sale=>{
+    const total = sale.total || (sale.order ? sale.order.reduce((sum,o)=> sum + o.price * o.qty, 0) : 0);
+    grandTotal += total;
+    const items = sale.order ? sale.order.map(o=>`${o.name} x${o.qty}`).join(', ') : "—";
+    rows.push([
+      sale.date,
+      items,
+      sale.payment || "—",
+      sale.received !== undefined ? sale.received : "—",
+      sale.change !== undefined ? sale.change : "—",
+      total.toFixed(2)
+    ]);
+  });
+  rows.push([]);
+  rows.push(["TOTAL SALES", "", "", "", "", grandTotal.toFixed(2)]);
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sales");
+  const filename = `Frosty_${period}_sales_${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, filename);
+}
+ function logout() {
+  // Save sales before clearing
+  const sales = localStorage.getItem("frostySales");
+
+  // Clear everything
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // Restore sales
+  if (sales) {
+    localStorage.setItem("frostySales", sales);
+  }
+
+  window.location.href = "login.html";
+}
+
+// Button listeners
+document.getElementById('dailyBtn').onclick  = ()=>exportExcel('daily');
+document.getElementById('weeklyBtn').onclick = ()=>exportExcel('weekly');
+document.getElementById('monthlyBtn').onclick= ()=>exportExcel('monthly');
+
+loadSales();
+</script>
+</body>
+</html>

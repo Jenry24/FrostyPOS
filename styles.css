@@ -1,0 +1,280 @@
+/* ---------- Base Reset ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+body {
+  display: flex;
+  background: linear-gradient(
+    20deg,
+    rgba(245, 245, 245, 1) 60%,
+    rgba(247, 236, 247, 1) 78%,
+    rgba(249, 222, 250, 1) 100%
+  );
+  color: #333;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 18vw; /* relative to screen width */
+  background: #4c5caf;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 3vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  box-shadow: 0.3vw 0 0.8vw rgba(0,0,0,0.1);
+}
+.sidebar .logo img {
+  width: 12vw;
+  height: 12vw;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 3vh;
+}
+.nav-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  padding: 2vh 0;
+  font-size: 1.8vw;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.nav-btn:hover,
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+.nav-btn.logout {
+  margin-top: auto;
+  background: rgba(255, 0, 0, 0.25);
+}
+.nav-btn.logout:hover {
+  background: rgba(255, 0, 0, 0.4);
+}
+
+/* ---------- Main Content ---------- */
+main {
+  margin-left: 18vw;
+  padding: 3vh 3vw;
+  width: calc(100% - 18vw);
+}
+main h1 {
+  font-size: 2.5vw;
+  margin: 2vh 0 1vh;
+  color: #4c5caf;
+  border-bottom: 0.3vh solid #e1e1e1;
+  padding-bottom: 1vh;
+}
+
+/* ---------- Product Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22vw, 1fr));
+  gap: 2vw;
+  margin-bottom: 3vh;
+}
+.card {
+  background: #fff;
+  border-radius: 1vw;
+  overflow: hidden;
+  box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.06);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card:hover {
+  transform: translateY(-0.5vh);
+  box-shadow: 0 0.8vw 1.5vw rgba(0,0,0,0.1);
+}
+.card img {
+  width: 100%;
+  height: 20vh;
+  object-fit: cover;
+}
+.card h3 {
+  font-size: 1.6vw;
+  margin: 1vh 0;
+  color: #222;
+}
+.card p {
+  font-size: 1.3vw;
+  color: #555;
+  margin-bottom: 1vh;
+}
+
+/* ---------- Modal ---------- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 1vw;
+  padding: 2vh 2vw;
+  width: 90%;
+  max-width: 80vw;
+  position: relative;
+  animation: fadeIn 0.2s ease;
+  box-shadow: 0 1vw 2vw rgba(0,0,0,0.2);
+}
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.9);}
+  to {opacity: 1; transform: scale(1);}
+}
+.modal-content img {
+  width: 100%;
+  height: 25vh;
+  object-fit: cover;
+  border-radius: 0.8vw;
+  margin-bottom: 2vh;
+}
+.modal-content h2 {
+  font-size: 2vw;
+  margin-bottom: 1vh;
+  color: #333;
+}
+.modal-content p {
+  font-size: 1.5vw;
+  color: #555;
+  margin-bottom: 1vh;
+}
+
+/* ---------- Size Buttons ---------- */
+.size-options {
+  display: flex;
+  gap: 1vw;
+  margin: 1vh 0 2vh;
+}
+.size-btn {
+  flex: 1;
+  padding: 1vh 0;
+  border: 0.2vw solid #ccc;
+  border-radius: 0.6vw;
+  text-align: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: all 0.2s;
+}
+.size-btn:hover {background: #f0f0f0;}
+.size-btn.active {
+  background: #4c5caf;
+  color: #fff;
+  border-color: #4c5caf;
+}
+
+/* ---------- Quantity Controls ---------- */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vw;
+  margin: 2vh 0;
+}
+.qty-controls button {
+  width: 5vw;
+  height: 5vw;
+  font-size: 2vw;
+  border: none;
+  border-radius: 0.6vw;
+  background: #4caf50;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.qty-controls button:hover {background: #43a047;}
+.qty-controls span {
+  font-size: 2vw;
+  font-weight: bold;
+  min-width: 3vw;
+  text-align: center;
+}
+
+/* ---------- Modal Buttons ---------- */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2vh;
+}
+.modal-actions button {
+  flex: 1;
+  margin: 0 0.5vw;
+  padding: 1.5vh 0;
+  border: none;
+  border-radius: 0.6vw;
+  font-size: 1.5vw;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#addOrder {background: #4c5caf; color: #fff;}
+#addOrder:hover {background: #3e4e9a;}
+#goCheckout {background: #2a9d8f; color: #fff;}
+#goCheckout:hover {background: #238378;}
+
+.close {
+  position: absolute;
+  top: 2vh;
+  right: 2vw;
+  font-size: 3vw;
+  color: #888;
+  cursor: pointer;
+}
+.close:hover {color: #444;}
+
+/* ---------- Sales Table ---------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-top: 3vh;
+  font-size: 1.5vw;
+}
+thead {
+  background: #4caf50;
+  color: #fff;
+}
+th, td {
+  border: 0.2vw solid #ddd;
+  padding: 1vh 1vw;
+  text-align: left;
+}
+tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* --- Export Buttons --- */
+.export-buttons {
+  margin-top: 3vh;
+  display: flex;
+  gap: 2vw;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.export-buttons button {
+  padding: 1.5vh 2vw;
+  background: #2196f3;
+  border: none;
+  border-radius: 0.6vw;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.5vw;
+  transition: background 0.2s;
+}
+.export-buttons button:hover {background: #1976d2;}
