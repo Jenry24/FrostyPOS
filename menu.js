@@ -8,6 +8,31 @@ function getCart() {
 function saveCart(c) {
   localStorage.setItem(cartKey, JSON.stringify(c));
 }
+const defaultProducts = [
+  // Kiddie Edition
+  { name: "Sugar Cone", section: "Kiddie Edition", price: "20", sizes: "", img: "frosty.jpg" },
+  { name: "Mini Rainbow Delight", section: "Kiddie Edition", price: "45", sizes: "", img: "frosty.jpg" },
+
+  // Sundaes
+  { name: "Chocolate Sundae", section: "Sundaes", price: "37", sizes: "", img: "frosty.jpg" },
+  { name: "Caramel Sundae", section: "Sundaes", price: "37", sizes: "", img: "frosty.jpg" },
+  { name: "Strawberry Sundae", section: "Sundaes", price: "37", sizes: "", img: "frosty.jpg" },
+
+  // Floats
+  { name: "Coke Float", section: "Floats", price: "", sizes: "12oz:39,16oz:49", img: "frosty.jpg" },
+  { name: "Chuckie Float", section: "Floats", price: "", sizes: "12oz:49,16oz:59", img: "frosty.jpg" },
+  { name: "Dutch Mill Float", section: "Floats", price: "", sizes: "12oz:49,16oz:59", img: "frosty.jpg" },
+
+  // Premium
+  { name: "Supreme Oreo", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Kitkat Pro", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Pepero Oreo", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Choco Almond", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Choco Stick", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Rainbow Oreo", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "White Choco Chips", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" },
+  { name: "Cashew Caramel", section: "Premium", price: "", sizes: "12oz:68,16oz:78", img: "frosty.jpg" }
+];
 
 // ======== Modal Elements ========
 const modal       = document.getElementById('productModal');
@@ -132,3 +157,53 @@ function showSuccess(msg) {
 okSuccess.onclick = () => {
   successModal.style.display = 'none';
 };
+function renderProducts() {
+  const sections = {};
+
+  // Group products by section
+  defaultProducts.forEach(p => {
+    if (!sections[p.section]) sections[p.section] = [];
+    sections[p.section].push(p);
+  });
+
+  const main = document.querySelector("main");
+  main.innerHTML = "";
+
+  // Render each section
+  for (const [section, products] of Object.entries(sections)) {
+    const h1 = document.createElement("h1");
+    h1.textContent = section;
+    main.appendChild(h1);
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    products.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.dataset.name = p.name;
+      div.dataset.img = p.img;
+      if (p.sizes) {
+        div.dataset.size = p.sizes;
+      } else {
+        div.dataset.price = p.price;
+      }
+
+      div.innerHTML = `
+        <img src="${p.img}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p>${
+          p.sizes
+            ? p.sizes.replace(/,/g, " / ").replace(/oz:/g, " oz ₱")
+            : "₱" + parseFloat(p.price).toFixed(2)
+        }</p>
+      `;
+
+      grid.appendChild(div);
+    });
+
+    main.appendChild(grid);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderProducts);
