@@ -1,111 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Frosty & Fancy Menu</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 2rem;
+    }
+    .card {
+      width: 150px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .card img {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    #clear-order-float {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      z-index: 9999;
+      transition: background 0.3s;
+    }
+    #clear-order-float:hover {
+      background: #d32f2f;
+    }
+
+    /* General modal */
+    .clear-modal, .success-modal {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+    .clear-modal-content, .success-modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      max-width: 300px;
+      width: 90%;
+    }
+    .modal-actions {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-around;
+    }
+    .btn-danger {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-cancel {
+      background: #ccc;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-danger:hover { background: #d32f2f; }
+    .btn-cancel:hover { background: #aaa; }
+  </style>
 </head>
 <body>
   <aside class="sidebar">
     <div class="logo"><img src="frosty.jpg" alt="Frosty Logo"></div>
     <button class="nav-btn active">Menu</button>
     <button class="nav-btn" onclick="location.href='sales.html'">Sales</button>
+    <button class="nav-btn" onclick="location.href='addproduct.html'">Add Product</button>
     <button class="nav-btn logout" onclick="logout()">Logout</button>
   </aside>
 
   <main>
-    <!-- Kiddie Edition -->
     <h1>Kiddie Edition</h1>
-    <div class="grid">
-      <div class="card" data-name="Sugar Cone" data-price="20" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Sugar Cone"><h3>Sugar Cone</h3><p>₱20.00</p>
-      </div>
-      <div class="card" data-name="Mini Rainbow Delight" data-price="45" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Mini Rainbow Delight"><h3>Mini Rainbow Delight</h3><p>₱45.00</p>
-      </div>
-    </div>
+    <div class="grid" id="kiddie"></div>
 
-    <!-- Sundaes -->
     <h1>Sundaes</h1>
-    <div class="grid">
-      <div class="card" data-name="Chocolate Sundae" data-price="37" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Chocolate"><h3>Chocolate</h3><p>₱37.00</p>
-      </div>
-      <div class="card" data-name="Caramel Sundae" data-price="37" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Caramel"><h3>Caramel</h3><p>₱37.00</p>
-      </div>
-      <div class="card" data-name="Strawberry Sundae" data-price="37" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Strawberry"><h3>Strawberry</h3><p>₱37.00</p>
-      </div>
-    </div>
+    <div class="grid" id="sundaes"></div>
 
-    <!-- Floats -->
     <h1>Floats</h1>
-    <div class="grid">
-      <div class="card" data-name="Coke Float" data-size="12:39,16:49" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Coke Float"><h3>Coke</h3><p>12 oz ₱39 / 16 oz ₱49</p>
-      </div>
-      <div class="card" data-name="Chuckie Float" data-size="12:49,16:59" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Chuckie"><h3>Chuckie</h3><p>12 oz ₱49 / 16 oz ₱59</p>
-      </div>
-      <div class="card" data-name="Dutch Mill Float" data-size="12:49,16:59" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Dutch Mill"><h3>Dutch Mill</h3><p>12 oz ₱49 / 16 oz ₱59</p>
-      </div>
-    </div>
+    <div class="grid" id="floats"></div>
 
-    <!-- Premium -->
     <h1>Premium</h1>
-    <div class="grid">
-      <!-- Same price for all premium items -->
-      <div class="card" data-name="Supreme Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Supreme Oreo"><h3>Supreme Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Kitkat Pro" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Kitkat Pro"><h3>Kitkat Pro</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Pepero Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Pepero Oreo"><h3>Pepero Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Choco Almond" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Choco Almond"><h3>Choco Almond</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Choco Stick" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Choco Stick"><h3>Choco Stick</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Rainbow Oreo" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Rainbow Oreo"><h3>Rainbow Oreo</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="White Choco Chips" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="White Choco Chips"><h3>White Choco Chips</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-      <div class="card" data-name="Cashew Caramel" data-size="12:68,16:78" data-img="frosty.jpg">
-        <img src="frosty.jpg" alt="Cashew Caramel"><h3>Cashew Caramel</h3><p>12 oz ₱68 / 16 oz ₱78</p>
-      </div>
-    </div>
+    <div class="grid" id="premium"></div>
   </main>
+  <button id="clear-order-float">🗑 Clear Order</button>
 
-  <!-- Floating Modal -->
+  <!-- Product Modal -->
   <div class="modal" id="productModal">
     <div class="modal-content">
       <span class="close" id="closeModal">&times;</span>
       <img id="modalImg" src="" alt="">
       <h2 id="modalName"></h2>
       <p id="modalPrice"></p>
-
-      <!-- Size options appear only if needed -->
-      <div class="size-options" id="sizeOptions">
-  
-  <div class="size-btn active" data-size="12oz">12oz ₱39</div> 
-</div>
-
-<div class="qty-controls">
-  <button id="minusQty">–</button>
-  <span id="modalQty">1</span>
-  <button id="plusQty">+</button>
-</div>
-      </label>
+      <div class="size-options" id="sizeOptions"></div>
+      <div class="qty-controls">
+        <button id="minusQty">–</button>
+        <span id="modalQty">1</span>
+        <button id="plusQty">+</button>
+      </div>
       <div class="modal-actions">
         <button id="addOrder">Add to Order</button>
         <button id="goCheckout">Proceed to Checkout</button>
@@ -113,17 +135,106 @@
     </div>
   </div>
 
-  <script src="menu.js">
-   function logout() {
-  // Only clear login info
-  localStorage.removeItem("loggedInUser");
-  sessionStorage.clear();
+  <!-- Clear Order Modal -->
+  <div id="clearOrderModal" class="clear-modal">
+    <div class="clear-modal-content">
+      <p>Are you sure you want to clear all orders?</p>
+      <div class="modal-actions">
+        <button id="confirmClear" class="btn-danger">Yes, Clear</button>
+        <button id="cancelClear" class="btn-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-  // Redirect to login page
-  window.location.href = "index.html";
-}
+  <!-- Success Modal -->
+  <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+      <p id="successMessage">Item added successfully!</p>
+    </div>
+  </div>
 
+  <script src="menu.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem("loggedInUser");
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    // ========== Success modal helper ==========
+    function showSuccess(msg) {
+      const modal = document.getElementById("successModal");
+      const message = document.getElementById("successMessage");
+      message.textContent = msg;
+      modal.style.display = "flex";
+      setTimeout(() => { modal.style.display = "none"; }, 1500);
+    }
+
+    // Load products from localStorage
+    function loadMenu() {
+      const products = JSON.parse(localStorage.getItem("products") || "[]");
+
+      const sections = {
+        "Kiddie Edition": document.getElementById("kiddie"),
+        "Sundaes": document.getElementById("sundaes"),
+        "Floats": document.getElementById("floats"),
+        "Premium": document.getElementById("premium"),
+      };
+
+      Object.values(sections).forEach(div => div.innerHTML = "");
+
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.name = p.name;
+        card.dataset.img = p.img;
+        if (p.sizes.includes(":")) {
+          card.dataset.size = p.sizes;
+        } else {
+          card.dataset.price = p.sizes;
+        }
+
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}">
+          <h3>${p.name}</h3>
+          <p>${p.sizes.includes(":") ? p.sizes.replace(/,/g," / ") : "₱" + p.sizes}</p>
+        `;
+
+        card.addEventListener("click", () => openModal(card));
+
+        if (sections[p.section]) {
+          sections[p.section].appendChild(card);
+        }
+      });
+    }
+
+    // ======== Clear Order Floating Button ========
+    const clearBtn = document.getElementById("clear-order-float");
+    const clearModal = document.getElementById("clearOrderModal");
+    const confirmClear = document.getElementById("confirmClear");
+    const cancelClear = document.getElementById("cancelClear");
+
+    clearBtn.addEventListener("click", () => {
+      let cart = JSON.parse(localStorage.getItem("frostyOrder") || "[]");
+      if (cart.length === 0) {
+        showSuccess("Cart is already empty!");
+        return;
+      }
+      clearModal.style.display = "flex";
+    });
+
+    cancelClear.addEventListener("click", () => {
+      clearModal.style.display = "none";
+    });
+
+    confirmClear.addEventListener("click", () => {
+      localStorage.setItem("frostyOrder", JSON.stringify([]));
+      clearModal.style.display = "none";
+      showSuccess("All orders cleared!");
+      window.location.reload();
+    });
+
+    window.onload = loadMenu;
   </script>
 </body>
 </html>
-
