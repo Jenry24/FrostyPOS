@@ -10,26 +10,32 @@ function saveCart(c) {
 }
 
 // ======== Modal Elements ========
-const modal      = document.getElementById('productModal');
-const modalImg   = document.getElementById('modalImg');
-const modalName  = document.getElementById('modalName');
-const modalPrice = document.getElementById('modalPrice');
-const modalQtyEl = document.getElementById('modalQty');
-const sizeOptions= document.getElementById('sizeOptions');
-const closeModal = document.getElementById('closeModal');
-const addOrderBtn= document.getElementById('addOrder');
-const goCheckout = document.getElementById('goCheckout');
+const modal       = document.getElementById('productModal');
+const modalImg    = document.getElementById('modalImg');
+const modalName   = document.getElementById('modalName');
+const modalPrice  = document.getElementById('modalPrice');
+const modalQtyEl  = document.getElementById('modalQty');
+const sizeOptions = document.getElementById('sizeOptions');
+const closeModal  = document.getElementById('closeModal');
+const addOrderBtn = document.getElementById('addOrder');
+const goCheckout  = document.getElementById('goCheckout');
+
+// Success modal
+const successModal   = document.getElementById('successModal');
+const successMessage = document.getElementById('successMessage');
+const okSuccess      = document.getElementById('okSuccess');
 
 let currentProduct = null;
 let currentQty = 1;
 
-// ======== Open Modal when a product card is clicked ========
-document.querySelectorAll('.card').forEach(card => {
-  card.addEventListener('click', () => {
+// ======== Open Modal when card clicked (event delegation) ========
+document.addEventListener("click", e => {
+  if (e.target.closest('.card')) {
+    const card = e.target.closest('.card');
     const name  = card.dataset.name;
     const img   = card.dataset.img;
-    const price = card.dataset.price;       // single-size price if exists
-    const sizes = card.dataset.size || '';  // e.g. "12oz:39,16oz:49"
+    const price = card.dataset.price;
+    const sizes = card.dataset.size || '';
 
     currentProduct = { name, img, price, sizes };
     currentQty = 1;
@@ -37,7 +43,6 @@ document.querySelectorAll('.card').forEach(card => {
     modalImg.src = img;
     modalName.textContent = name;
 
-    // Build size buttons
     sizeOptions.innerHTML = '';
     if (sizes) {
       const opts = sizes.split(',');
@@ -49,18 +54,21 @@ document.querySelectorAll('.card').forEach(card => {
         div.textContent = `${label} ₱${p}`;
         sizeOptions.appendChild(div);
       });
-      modalPrice.textContent = ''; // price comes from selection
+      modalPrice.textContent = '';
     } else {
       modalPrice.textContent = `₱${parseFloat(price).toFixed(2)}`;
     }
 
     modal.style.display = 'flex';
-  });
+  }
 });
 
 // ======== Close Modal ========
 closeModal.onclick = () => modal.style.display = 'none';
-window.onclick = e => { if (e.target === modal) modal.style.display = 'none'; };
+window.onclick = e => {
+  if (e.target === modal) modal.style.display = 'none';
+  if (e.target === successModal) successModal.style.display = 'none';
+};
 
 // ======== Size Selection ========
 sizeOptions.addEventListener('click', e => {
@@ -108,10 +116,19 @@ function addItemAnd(option) {
     window.location.href = 'summary.html';
   } else {
     modal.style.display = 'none';
-    alert('Added to order!');
+    showSuccess("✅ Added to order!");
   }
 }
 
 addOrderBtn.onclick = () => addItemAnd('add');
 goCheckout.onclick = () => addItemAnd('checkout');
-  
+
+// ======== Success Modal Helper ========
+function showSuccess(msg) {
+  successMessage.textContent = msg;
+  successModal.style.display = 'flex';
+}
+
+okSuccess.onclick = () => {
+  successModal.style.display = 'none';
+};
