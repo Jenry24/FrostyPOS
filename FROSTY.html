@@ -233,8 +233,30 @@
       showSuccess("All orders cleared!");
       window.location.reload();
     });
+  products.forEach(p => {
+  if (!p.section) {
+    console.warn("Missing section:", p);
+    return;
+  }
+  // rest of code to render
+});
+function preloadMenu() {
+  let products = JSON.parse(localStorage.getItem('products') || "[]");
+  if (products.length === 0) {
+    products = [
+      { name: "Sugar Cone", section: "Kiddie Edition", sizes: "20", img: "frosty.jpg" },
+      // ... all others ...
+    ];
+    localStorage.setItem('products', JSON.stringify(products));
+  }
+}
+window.onload = () => {
+  preloadMenu();
+  loadMenu();
+}
 
     window.onload = loadMenu;
   </script>
 </body>
 </html>
+
