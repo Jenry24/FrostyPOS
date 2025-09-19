@@ -161,61 +161,12 @@ function showSuccess(msg) {
 // ======== Render Products (Default + LocalStorage) ========
 function renderProducts() {
   const storedProducts = JSON.parse(localStorage.getItem(productsKey) || '[]');
-  const allProducts = [...defaultProducts, ...storedProducts];
 
-  const sections = {};
-  allProducts.forEach(p => {
-    if (!sections[p.section]) sections[p.section] = [];
-    sections[p.section].push(p);
-  });
-
-  const main = document.querySelector("main");
-  main.innerHTML = "";
-
-  for (const [section, products] of Object.entries(sections)) {
-    const h1 = document.createElement("h1");
-    h1.textContent = section;
-    main.appendChild(h1);
-
-    const grid = document.createElement("div");
-    grid.className = "grid";
-
-    products.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.dataset.name = p.name;
-      div.dataset.img = p.img;
-      if (p.sizes) {
-        div.dataset.size = p.sizes;
-      } else {
-        div.dataset.price = p.price;
-      }
-
-      div.innerHTML = `
-        <img src="${p.img}" alt="${p.name}">
-        <h3>${p.name}</h3>
-        <p>${
-          p.sizes
-            ? p.sizes.replace(/,/g, " / ").replace(/oz:/g, " oz ₱")
-            : "₱" + parseFloat(p.price).toFixed(2)
-        }</p>
-      `;
-
-      grid.appendChild(div);
-    });
-
-    main.appendChild(grid);
-  }
-}
-function loadMenu() {
-  const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
-
-  // Merge default + stored
+  // Merge without duplicates
   const combined = [...defaultProducts];
-
   storedProducts.forEach(p => {
     const exists = combined.some(dp => dp.name === p.name && dp.section === p.section);
-    if (!exists) combined.push(p); // only add if unique
+    if (!exists) combined.push(p);
   });
 
   const sections = {
@@ -228,7 +179,7 @@ function loadMenu() {
   // Clear existing
   Object.values(sections).forEach(div => div.innerHTML = "");
 
-  // Render
+  // Render cards
   combined.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
@@ -250,11 +201,11 @@ function loadMenu() {
       }</p>
     `;
 
-    card.addEventListener("click", () => openModal(card));
-
     if (sections[p.section]) {
       sections[p.section].appendChild(card);
     }
   });
 }
+
+// Render on load
 document.addEventListener("DOMContentLoaded", renderProducts);
