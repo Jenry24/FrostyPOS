@@ -1,5 +1,6 @@
 const cartKey = 'frostyOrder';   // for current order
 const salesKey = 'frostySales';  // for completed sales
+const productsKey = 'products';  // for user-added products
 
 // ======== Cart Helpers ========
 function getCart() {
@@ -8,6 +9,8 @@ function getCart() {
 function saveCart(c) {
   localStorage.setItem(cartKey, JSON.stringify(c));
 }
+
+// ======== Default Products ========
 const defaultProducts = [
   // Kiddie Edition
   { name: "Sugar Cone", section: "Kiddie Edition", price: "20", sizes: "", img: "frosty.jpg" },
@@ -48,12 +51,12 @@ const goCheckout  = document.getElementById('goCheckout');
 // Success modal
 const successModal   = document.getElementById('successModal');
 const successMessage = document.getElementById('successMessage');
-const okSuccess      = document.getElementById('okSuccess');
 
+// ======== State ========
 let currentProduct = null;
 let currentQty = 1;
 
-// ======== Open Modal when card clicked (event delegation) ========
+// ======== Open Modal when card clicked ========
 document.addEventListener("click", e => {
   if (e.target.closest('.card')) {
     const card = e.target.closest('.card');
@@ -152,16 +155,16 @@ goCheckout.onclick = () => addItemAnd('checkout');
 function showSuccess(msg) {
   successMessage.textContent = msg;
   successModal.style.display = 'flex';
+  setTimeout(() => successModal.style.display = 'none', 1500);
 }
 
-okSuccess.onclick = () => {
-  successModal.style.display = 'none';
-};
+// ======== Render Products (Default + LocalStorage) ========
 function renderProducts() {
-  const sections = {};
+  const storedProducts = JSON.parse(localStorage.getItem(productsKey) || '[]');
+  const allProducts = [...defaultProducts, ...storedProducts];
 
-  // Group products by section
-  defaultProducts.forEach(p => {
+  const sections = {};
+  allProducts.forEach(p => {
     if (!sections[p.section]) sections[p.section] = [];
     sections[p.section].push(p);
   });
@@ -169,7 +172,6 @@ function renderProducts() {
   const main = document.querySelector("main");
   main.innerHTML = "";
 
-  // Render each section
   for (const [section, products] of Object.entries(sections)) {
     const h1 = document.createElement("h1");
     h1.textContent = section;
@@ -205,5 +207,54 @@ function renderProducts() {
     main.appendChild(grid);
   }
 }
+function loadMenu() {
+  const storedProducts = JSON.parse(localStorage.getItem("products") || "[]");
 
+  // Merge default + stored
+  const combined = [...defaultProducts];
+
+  storedProducts.forEach(p => {
+    const exists = combined.some(dp => dp.name === p.name && dp.section === p.section);
+    if (!exists) combined.push(p); // only add if unique
+  });
+
+  const sections = {
+    "Kiddie Edition": document.getElementById("kiddie"),
+    "Sundaes": document.getElementById("sundaes"),
+    "Floats": document.getElementById("floats"),
+    "Premium": document.getElementById("premium"),
+  };
+
+  // Clear existing
+  Object.values(sections).forEach(div => div.innerHTML = "");
+
+  // Render
+  combined.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.name = p.name;
+    card.dataset.img = p.img;
+    if (p.sizes && p.sizes.includes(":")) {
+      card.dataset.size = p.sizes;
+    } else {
+      card.dataset.price = p.sizes || p.price;
+    }
+
+    card.innerHTML = `
+      <img src="${p.img}" alt="${p.name}">
+      <h3>${p.name}</h3>
+      <p>${
+        p.sizes && p.sizes.includes(":")
+          ? p.sizes.replace(/,/g, " / ").replace(/oz:/g, " oz ₱")
+          : "₱" + parseFloat(p.price || p.sizes).toFixed(2)
+      }</p>
+    `;
+
+    card.addEventListener("click", () => openModal(card));
+
+    if (sections[p.section]) {
+      sections[p.section].appendChild(card);
+    }
+  });
+}
 document.addEventListener("DOMContentLoaded", renderProducts);
