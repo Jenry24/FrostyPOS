@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Frosty & Fancy Menu</title>
+  <title>FrostyPOS Menu</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     .grid {
@@ -43,12 +43,10 @@
       z-index: 9999;
       transition: background 0.3s;
     }
-    #clear-order-float:hover {
-      background: #d32f2f;
-    }
+    #clear-order-float:hover { background: #d32f2f; }
 
-    /* General modal */
-    .clear-modal, .success-modal {
+    /* Modals */
+    .modal, .clear-modal, .success-modal {
       display: none;
       position: fixed;
       z-index: 10000;
@@ -58,7 +56,7 @@
       justify-content: center;
       align-items: center;
     }
-    .clear-modal-content, .success-modal-content {
+    .modal-content, .clear-modal-content, .success-modal-content {
       background: white;
       padding: 20px;
       border-radius: 10px;
@@ -92,6 +90,7 @@
   </style>
 </head>
 <body>
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo"><img src="frosty.jpg" alt="Frosty Logo"></div>
     <button class="nav-btn active">Menu</button>
@@ -100,6 +99,7 @@
     <button class="nav-btn logout" onclick="logout()">Logout</button>
   </aside>
 
+  <!-- Main Content -->
   <main>
     <h1>Kiddie Edition</h1>
     <div class="grid" id="kiddie"></div>
@@ -113,6 +113,8 @@
     <h1>Premium</h1>
     <div class="grid" id="premium"></div>
   </main>
+
+  <!-- Floating Clear Button -->
   <button id="clear-order-float">🗑 Clear Order</button>
 
   <!-- Product Modal -->
@@ -153,15 +155,17 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="menu.js"></script>
   <script>
+    // Logout
     function logout() {
       localStorage.removeItem("loggedInUser");
       sessionStorage.clear();
       window.location.href = "login.html";
     }
 
-    // ========== Success modal helper ==========
+    // Success modal helper
     function showSuccess(msg) {
       const modal = document.getElementById("successModal");
       const message = document.getElementById("successMessage");
@@ -170,93 +174,8 @@
       setTimeout(() => { modal.style.display = "none"; }, 1500);
     }
 
-    // Load products from localStorage
-    function loadMenu() {
-      const products = JSON.parse(localStorage.getItem("products") || "[]");
-
-      const sections = {
-        "Kiddie Edition": document.getElementById("kiddie"),
-        "Sundaes": document.getElementById("sundaes"),
-        "Floats": document.getElementById("floats"),
-        "Premium": document.getElementById("premium"),
-      };
-
-      Object.values(sections).forEach(div => div.innerHTML = "");
-
-      products.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.dataset.name = p.name;
-        card.dataset.img = p.img;
-        if (p.sizes.includes(":")) {
-          card.dataset.size = p.sizes;
-        } else {
-          card.dataset.price = p.sizes;
-        }
-
-        card.innerHTML = `
-          <img src="${p.img}" alt="${p.name}">
-          <h3>${p.name}</h3>
-          <p>${p.sizes.includes(":") ? p.sizes.replace(/,/g," / ") : "₱" + p.sizes}</p>
-        `;
-
-        card.addEventListener("click", () => openModal(card));
-
-        if (sections[p.section]) {
-          sections[p.section].appendChild(card);
-        }
-      });
-    }
-
-    // ======== Clear Order Floating Button ========
-    const clearBtn = document.getElementById("clear-order-float");
-    const clearModal = document.getElementById("clearOrderModal");
-    const confirmClear = document.getElementById("confirmClear");
-    const cancelClear = document.getElementById("cancelClear");
-
-    clearBtn.addEventListener("click", () => {
-      let cart = JSON.parse(localStorage.getItem("frostyOrder") || "[]");
-      if (cart.length === 0) {
-        showSuccess("Cart is already empty!");
-        return;
-      }
-      clearModal.style.display = "flex";
-    });
-
-    cancelClear.addEventListener("click", () => {
-      clearModal.style.display = "none";
-    });
-
-    confirmClear.addEventListener("click", () => {
-      localStorage.setItem("frostyOrder", JSON.stringify([]));
-      clearModal.style.display = "none";
-      showSuccess("All orders cleared!");
-      window.location.reload();
-    });
-  products.forEach(p => {
-  if (!p.section) {
-    console.warn("Missing section:", p);
-    return;
-  }
-  // rest of code to render
-});
-function preloadMenu() {
-  let products = JSON.parse(localStorage.getItem('products') || "[]");
-  if (products.length === 0) {
-    products = [
-      { name: "Sugar Cone", section: "Kiddie Edition", sizes: "20", img: "frosty.jpg" },
-      // ... all others ...
-    ];
-    localStorage.setItem('products', JSON.stringify(products));
-  }
-}
-window.onload = () => {
-  preloadMenu();
-  loadMenu();
-}
-
+    // Load menu when page opens
     window.onload = loadMenu;
   </script>
 </body>
 </html>
-
